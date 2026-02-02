@@ -2,11 +2,11 @@
 {
     public enum PaymentType
     {
-        Cash = 1,
-        CreditCard = 2,
-        DebitCard = 3,
-        Pix = 5,
-        BankTransfer = 6,
-        Other = 7
+        Cash = 0,
+        CreditCard = 1,
+        DebitCard = 2,
+        Pix = 3,
+        BankTransfer = 4,
+        Other = 5
     }
 }

@@ -3,14 +3,14 @@
     public enum Category
     {
         // Expense
-        Housing = 1,
-        Transportation = 2,
-        Food = 3,
-        Health = 4,
-        Leisure = 5,       
-        Education = 6,
-        Shopping = 7,      
-        Services = 8,
+        Housing = 0,
+        Transportation = 1,
+        Food = 2,
+        Health = 3,
+        Leisure = 4,       
+        Education = 5,
+        Shopping = 6,      
+        Services = 7,
 
         // Income
         Salary = 100,       
