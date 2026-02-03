@@ -1,29 +1,49 @@
-﻿using ExpenseTracker.Data.Models;
+﻿using ExpenseTracker.Data;
+using ExpenseTracker.Data.Models;
 using ExpenseTracker.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseTracker.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        public Task<User?> GetUserByIdAsync(int userId)
+        private readonly AppDbContext _context;
+
+        public UserRepository(AppDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
-        public Task<User?> GetUserByEmailAsync(string email)
+
+        public async Task<User?> GetUserByIdAsync(int userId)
         {
-            throw new NotImplementedException();
+            return await _context.Users
+                .FindAsync(userId);
         }
-        public Task<User?> CreateUserAsync(User user)
+        public async Task<User?> GetUserByEmailAsync(string email)
         {
-            throw new NotImplementedException();
+            return await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Email == email);
         }
-        public Task<User?> UpdateUserAsync(User user)
+        public async Task<User?> CreateUserAsync(User user)
         {
-            throw new NotImplementedException();
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+
+            return user;
         }
-        public Task<bool> DeleteUserAsync(int userId)
+        public async Task UpdateUserAsync(User user)
         {
-            throw new NotImplementedException();
+             _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+        }
+        public async Task<bool> DeleteUserAsync(int userId)
+        {
+            var affectedRows = await _context.Users
+                .Where(u => u.Id == userId)
+                .ExecuteDeleteAsync();
+
+            return affectedRows > 0;
         }
     }
 }

@@ -77,9 +77,9 @@ namespace ExpenseTracker.Services
 
             user.UpdatedAt = DateTime.UtcNow;
 
-            var updatedUser = await _userRepository.UpdateUserAsync(user);
+            await _userRepository.UpdateUserAsync(user);
 
-            return updatedUser == null ? null : new UserResponseDto(updatedUser);
+            return user == null ? null : new UserResponseDto(user);
         }
 
         public async Task<bool> DeleteUserAsync(int userId)
