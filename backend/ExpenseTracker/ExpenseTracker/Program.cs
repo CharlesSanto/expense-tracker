@@ -6,7 +6,6 @@ using ExpenseTracker.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using ExpenseTracker.Validators.AuthValidator;
 
 var builder = WebApplication.CreateBuilder(args);
 
