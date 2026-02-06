@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ExpenseTracker.DTOs.Auth;
+using ExpenseTracker.Services.Interfaces;
+using ExpenseTracker.DTOs.UserDTOs;
+using ExpenseTracker.Data.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExpenseTracker.Controllers
 {
@@ -7,17 +11,44 @@ namespace ExpenseTracker.Controllers
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
+        private readonly IUserService _userService;
+        private readonly IAuthService _authService;
+
+        public AuthController(IUserService userService, IAuthService authService)
+        {
+            _userService = userService;
+            _authService = authService;
+        }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            
-            return Ok(new { Message = "Login successful" });
+            var user = await _authService.LoginAsync(loginDto);
+
+            if (user is null)
+                return Unauthorized(new { Message = "Email ou senha incorretos." });
+
+            var token = await _authService.GenerateJwtToken(user);
+
+            return Ok(new { Token = token, User = user });
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto registerDto)
         {
-            return Ok(new { Message = "Registration successful" });
+            try
+            {
+                var newUser = await _userService.CreateUserAsync(registerDto);
+
+                if (newUser is null)
+                    return BadRequest(new { Message = "User registration failed" });
+
+                return Created($"/api/users/{newUser.Id}", newUser);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { ex.Message });
+            }
         }
     }
 }
