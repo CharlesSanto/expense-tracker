@@ -1,29 +1,54 @@
-﻿using ExpenseTracker.Data.Models;
+﻿using ExpenseTracker.Data;
+using ExpenseTracker.Data.Models;
 using ExpenseTracker.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace ExpenseTracker.Repositories
 {
     public class TransactionRepository : ITransactionRepository
     {
-        public Task<Transaction?> GetTransactionByIdAsync(int transactionId)
+
+        private readonly AppDbContext _context;
+
+        public TransactionRepository(AppDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
-        public Task<IEnumerable<Transaction>> GetAllTransactionsAsync()
+
+        public async Task<Transaction?> GetTransactionByIdAsync(int userId, int transactionId)
         {
-            throw new NotImplementedException();
+            return await _context.Transactions
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.UserId == userId && t.Id == transactionId);
         }
-        public Task<Transaction?> CreateTransactionAsync(Transaction transaction)
+        public async Task<IEnumerable<Transaction>> GetAllTransactionsAsync(int userId)
         {
-            throw new NotImplementedException();
+            return await _context.Transactions
+                .AsNoTracking()
+                .Where(t => t.UserId == userId)
+                .ToListAsync();
         }
-        public Task<bool> DeleteTransactionAsync(int transactionId)
+        public async Task<Transaction?> CreateTransactionAsync(Transaction transaction)
         {
-            throw new NotImplementedException();
+            _context.Add(transaction);
+            await _context.SaveChangesAsync();
+            return transaction;
         }
-        public Task<Transaction?> UpdateTransactionAsync(Transaction transaction)
+        public async Task<Transaction?> UpdateTransactionAsync(int userId, Transaction transaction)
         {
-            throw new NotImplementedException();
+            if (transaction.UserId != userId) return null;
+
+            _context.Transactions.Update(transaction);
+            await _context.SaveChangesAsync();
+            return transaction;
         }
+        public async Task<bool> DeleteTransactionAsync(int userId, int transactionId)
+        {
+            var rows = await _context.Transactions
+                .Where(t => t.Id == transactionId && t.UserId == userId)
+                .ExecuteDeleteAsync();
+            return rows > 0;
+        }
+        
     }
 }
