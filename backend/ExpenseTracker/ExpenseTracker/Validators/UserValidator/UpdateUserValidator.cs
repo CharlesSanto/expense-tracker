@@ -3,9 +3,9 @@ using ExpenseTracker.DTOs.UserDTOs;
 
 namespace ExpenseTracker.Validators.UserValidator
 {
-    public class UpdateUserDtoValidator : AbstractValidator<UpdateUserDto>
+    public class UpdateUserValidator : AbstractValidator<UpdateUserDto>
     {
-        public UpdateUserDtoValidator()
+        public UpdateUserValidator()
         {
             RuleFor(x => x.Name)
                 .MaximumLength(100).WithMessage("O nome deve ter no máximo 25 caracteres.")
