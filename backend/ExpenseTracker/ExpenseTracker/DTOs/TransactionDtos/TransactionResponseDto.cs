@@ -15,6 +15,7 @@ namespace ExpenseTracker.DTOs.TransactionDtos
 
         public TransactionResponseDto(Transaction transaction)
         {
+            Id = transaction.Id;
             Description = transaction.Description;
             Amount = transaction.Amount;
             Category = transaction.Category;

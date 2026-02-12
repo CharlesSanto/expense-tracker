@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace ExpenseTracker.Controllers
 {
     [ApiController]
-    [Route("api/auth")]
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
@@ -28,9 +28,7 @@ namespace ExpenseTracker.Controllers
             if (user is null)
                 return Unauthorized(new { Message = "Email ou senha incorretos." });
 
-            var token = await _authService.GenerateJwtToken(user);
-
-            return Ok(new { Token = token, User = user });
+            return Ok(user);
         }
 
         [HttpPost("register")]

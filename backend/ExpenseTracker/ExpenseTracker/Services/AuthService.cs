@@ -14,6 +14,7 @@ namespace ExpenseTracker.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
+        private static readonly JwtSecurityTokenHandler _tokenHandler = new();
 
         public AuthService(IUserRepository userRepository, IConfiguration configuration)
         {
@@ -21,17 +22,21 @@ namespace ExpenseTracker.Services
             _configuration = configuration;
         }
 
-        public async Task<UserResponseDto> LoginAsync(LoginDto loginDto)
+        public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto)
         {
             var user = await _userRepository.GetUserByEmailAsync(loginDto.Email);
 
             if (user == null || !PasswordHasher.VerifyPassword(loginDto.Password, user.PasswordHash)) 
                 return null;
 
-            return new UserResponseDto(user);
+            var userDto = new UserResponseDto(user);
+
+            var token = GenerateJwtToken(userDto);
+
+            return new AuthResponseDto(token, userDto);
         }
 
-        public async Task<string> GenerateJwtToken(UserResponseDto user)
+        public string GenerateJwtToken(UserResponseDto user)
         {
             var claims = new[]
             {
@@ -51,7 +56,7 @@ namespace ExpenseTracker.Services
                 expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: creds);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return _tokenHandler.WriteToken(token);
         }
     }
 }
