@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ExpenseTracker.DTOs.Auth;
 using ExpenseTracker.Services.Interfaces;
-using ExpenseTracker.DTOs.UserDTOs;
-using ExpenseTracker.Data.Models;
-using Microsoft.AspNetCore.Authorization;
-
 namespace ExpenseTracker.Controllers
 {
     [ApiController]
