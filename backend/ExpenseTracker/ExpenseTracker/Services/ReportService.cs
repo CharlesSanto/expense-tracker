@@ -43,7 +43,6 @@ namespace ExpenseTracker.Services
                     {
                         CategoryName = g.Key.ToString(),
                         Amount = g.Sum(t => t.Amount),
-                        Count = g.Count(),
                         Percentage = totalIncome > 0
                         ? (double)Math.Round((g.Sum(t => t.Amount) / totalIncome) * 100, 2)
                         : 0
@@ -58,13 +57,30 @@ namespace ExpenseTracker.Services
                     {
                         CategoryName = g.Key.ToString(),
                         Amount = g.Sum(t => t.Amount),
-                        Count = g.Count(),
                         Percentage = totalExpense > 0
                         ? (double)Math.Round((g.Sum(t => t.Amount) / totalExpense) * 100, 2)
                         : 0
                     })
-                    .OrderByDescending(c => c.Amount)   
-                    .ToList()
+                    .OrderByDescending(c => c.Amount)
+                    .ToList(),
+
+                PaymentMethods = transactions
+                    .Where(t => t.Type == TransactionType.Expense)
+                    .GroupBy(t => t.PaymentType)
+                    .Select(g => 
+                    {
+                        var total = g.Sum(t => t.Amount);
+                        return new PaymentTypeSummaryDto
+                        {
+                            PaymentType = g.Key.ToString(),
+                            Amount = total,
+                            Percentage = totalExpense > 0
+                            ? (double)Math.Round((total / totalExpense) * 100, 2)
+                            : 0
+                        };
+                    })
+                    .OrderByDescending(g => g.Amount)
+                    .ToList(),
             };
 
             return report;

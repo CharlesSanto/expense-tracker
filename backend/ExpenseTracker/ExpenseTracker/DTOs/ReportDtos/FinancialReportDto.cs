@@ -1,4 +1,6 @@
-﻿namespace ExpenseTracker.DTOs.ReportDtos
+﻿using ExpenseTracker.Data.Enums;
+
+namespace ExpenseTracker.DTOs.ReportDtos
 {
     public class FinancialReportDto
     {
@@ -9,13 +11,20 @@
         public decimal PeriodBalance => TotalIncome - TotalExpense;
         public List<CategorySummaryDto> IncomeCategories { get; set; } = [];
         public List<CategorySummaryDto> ExpenseCategories { get; set; } = [];
+        public List<PaymentTypeSummaryDto> PaymentMethods { get; set; } = [];
     }
 
     public class CategorySummaryDto
     {
         public string CategoryName { get; set; } = string.Empty;
         public decimal Amount { get; set; }
-        public int Count { get; set; }
+        public double Percentage { get; set; }
+    }
+
+    public class PaymentTypeSummaryDto
+    {
+        public string PaymentType { get; set; } = string.Empty;
+        public decimal Amount { get; set; }
         public double Percentage { get; set; }
     }
 }
