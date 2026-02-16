@@ -20,13 +20,11 @@ namespace ExpenseTracker.Services
 
             var transactions = await _transactionRepository.GetByDateRangeAsync(userId, finalStart, finalEnd);
 
-            var totalIncome = transactions
-                .Where(t => t.Type == TransactionType.Income)
-                .Sum(t => t.Amount);
+            var incomes = transactions.Where(t => t.Type == TransactionType.Income).ToList();
+            var expenses = transactions.Where(t => t.Type == TransactionType.Expense).ToList();
 
-            var totalExpense = transactions
-                .Where(t => t.Type == TransactionType.Expense)
-                .Sum(t => t.Amount);
+            var totalIncome = incomes.Sum(t => t.Amount);
+            var totalExpense = expenses.Sum(t => t.Amount);
 
             var report = new FinancialReportDto
             {
@@ -36,36 +34,43 @@ namespace ExpenseTracker.Services
                 TotalIncome = totalIncome,
                 TotalExpense = totalExpense,
 
-                IncomeCategories = transactions
-                    .Where(t => t.Type == TransactionType.Income)
+                IncomeCategories = incomes
                     .GroupBy(t => t.Category)
-                    .Select(g => new CategorySummaryDto
+                    .Select(g =>
                     {
-                        CategoryName = g.Key.ToString(),
-                        Amount = g.Sum(t => t.Amount),
-                        Percentage = totalIncome > 0
-                        ? (double)Math.Round((g.Sum(t => t.Amount) / totalIncome) * 100, 2)
-                        : 0
+                        var amount = g.Sum(t => t.Amount);
+
+                        return new CategorySummaryDto
+                        {
+                            CategoryName = g.Key.ToString(),
+                            Amount = amount,
+                            Percentage = totalIncome > 0
+                            ? (double)Math.Round((amount / totalIncome) * 100, 2)
+                            : 0
+                        };
                     })
                     .OrderByDescending(c => c.Amount)
                     .ToList(),
 
-                ExpenseCategories = transactions
-                    .Where(t => t.Type == TransactionType.Expense)
+                ExpenseCategories = expenses
                     .GroupBy(t => t.Category)
-                    .Select(g => new CategorySummaryDto
+                    .Select(g =>
                     {
-                        CategoryName = g.Key.ToString(),
-                        Amount = g.Sum(t => t.Amount),
-                        Percentage = totalExpense > 0
-                        ? (double)Math.Round((g.Sum(t => t.Amount) / totalExpense) * 100, 2)
-                        : 0
+                        var amount = g.Sum(t => t.Amount);
+
+                        return new CategorySummaryDto
+                        {
+                            CategoryName = g.Key.ToString(),
+                            Amount = amount,
+                            Percentage = totalExpense > 0
+                            ? (double)Math.Round((amount / totalExpense) * 100, 2)
+                            : 0
+                        };
                     })
                     .OrderByDescending(c => c.Amount)
                     .ToList(),
 
-                PaymentMethods = transactions
-                    .Where(t => t.Type == TransactionType.Expense)
+                PaymentMethods = expenses
                     .GroupBy(t => t.PaymentType)
                     .Select(g => 
                     {
@@ -79,7 +84,7 @@ namespace ExpenseTracker.Services
                             : 0
                         };
                     })
-                    .OrderByDescending(g => g.Amount)
+                    .OrderByDescending(p => p.Amount)
                     .ToList(),
             };
 
