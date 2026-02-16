@@ -9,5 +9,6 @@ namespace ExpenseTracker.Repositories.Interfaces
         Task<Transaction?> CreateTransactionAsync(Transaction transaction);
         Task<Transaction?> UpdateTransactionAsync(int userId, Transaction transaction);
         Task<bool> DeleteTransactionAsync(int userId, int transactionId);
+        Task<IEnumerable<Transaction>> GetByDateRangeAsync(int userId, DateTime StartDate, DateTime EndDate);
     }
 }

@@ -49,6 +49,16 @@ namespace ExpenseTracker.Repositories
                 .ExecuteDeleteAsync();
             return rows > 0;
         }
+
+        public async Task<IEnumerable<Transaction>> GetByDateRangeAsync(int userId, DateTime StartDate, DateTime EndDate)
+        {
+            var transactions = await _context.Transactions
+                .AsNoTracking()
+                .Where(t => t.UserId == userId && t.Date >= StartDate && t.Date <= EndDate)
+                .ToListAsync();
+
+            return transactions;
+        }
         
     }
 }
