@@ -3,9 +3,9 @@ using ExpenseTracker.DTOs.Auth;
 
 namespace ExpenseTracker.Validators.AuthValidator
 {
-    public class LoginDtoValidator : AbstractValidator<LoginDto>
+    public class LoginValidator : AbstractValidator<LoginDto>
     {
-        public LoginDtoValidator()
+        public LoginValidator()
         {
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("Campo obrigatório.");
