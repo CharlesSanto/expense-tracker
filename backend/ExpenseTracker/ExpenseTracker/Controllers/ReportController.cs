@@ -17,7 +17,7 @@ namespace ExpenseTracker.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetFinancialReport([FromQuery] string range, [FromQuery] DateTime? StartDate, [FromQuery] DateTime? EndDate)
+        public async Task<IActionResult> GetFinancialReport(string range = "monthly", DateTime? StartDate = null, DateTime? EndDate = null)
         {
             var user = GetUserId();
 

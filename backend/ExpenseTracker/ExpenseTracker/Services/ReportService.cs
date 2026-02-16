@@ -94,8 +94,7 @@ namespace ExpenseTracker.Services
             {
                 "daily" => (now.Date, now.Date.AddDays(1).AddTicks(-1)),
 
-                "weekly" => (now.AddDays(-(int)now.DayOfWeek).Date,
-                             now.AddDays(7 - (int)now.DayOfWeek).Date.AddTicks(-1)),
+                "weekly" => (now.AddDays(-7).Date, now.Date.AddDays(1).AddTicks(-1)),
 
                 "monthly" => (new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc),
                               new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month), 23, 59, 59, 999, DateTimeKind.Utc)),
