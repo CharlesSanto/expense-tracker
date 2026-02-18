@@ -1,8 +1,4 @@
 <Solution>
-  <Folder Name="/.github/" />
-  <Folder Name="/.github/workflows/">
-    <File Path="dotnet.yml" />
-  </Folder>
   <Project Path="ExpenseTracker.Tests/ExpenseTracker.Tests.csproj" Id="f7718af4-ca22-43b4-8e96-7cbdbd13df7c" />
   <Project Path="ExpenseTracker/ExpenseTracker.csproj" />
 </Solution>
