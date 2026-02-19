@@ -142,6 +142,20 @@ namespace ExpenseTracker.Tests.Services
             firstResult.Amount.Should().Be(1500);
         }
 
+        [Fact]
+        public async Task GetAllTransactionsAsync_ShouldReturnEmptyList_WhenNoTransactionsExist()
+        {
+            int user = 1;
+
+            _transactionRepositoryMock.Setup(r => r.GetAllTransactionsAsync(user))
+                .ReturnsAsync(new List<Transaction>());
+
+            var result = await _transactionService.GetAllTransactionsAsync(user);
+
+            result.Should().NotBeNull();
+            result.Should().BeEmpty();
+        }
+
         #endregion
 
         #region Update Tests
@@ -211,11 +225,29 @@ namespace ExpenseTracker.Tests.Services
             _transactionRepositoryMock.Verify(r => r.UpdateTransactionAsync(It.IsAny<int>(), It.IsAny<Transaction>()), Times.Never);
         }
 
-        #endregion
-
-        #region Delete Tests
-
         [Fact]
+        public async Task UpdateTransaction_ShouldOnlyUpdateCategory_WhenOnlyCategoryIsProvided()
+        {
+            var existing = new Transaction { Id = 1, UserId = 1, Amount = 500, Category = Category.Food };
+            var updateDto = new UpdateTransactionDto { Category = Category.Housing };
+
+            _transactionRepositoryMock.Setup(r => r.GetTransactionByIdAsync(1, 1))
+                .ReturnsAsync(existing);
+
+            _transactionRepositoryMock.Setup(r => r.UpdateTransactionAsync(1, It.IsAny<Transaction>()))
+                .ReturnsAsync((int id, Transaction t) => t);
+
+            var result = await _transactionService.UpdateTransactionAsync(1, 1, updateDto);
+
+            result!.Category.Should().Be(Category.Housing);
+            result.Amount.Should().Be(500);
+        }
+
+#endregion
+
+            #region Delete Tests
+
+            [Fact]
         public async Task DeleteTransaction_ShouldReturnTrue_WhenRepositoryReturnsTrue()
         {
             _transactionRepositoryMock.Setup(r => r.DeleteTransactionAsync(1, 1))
