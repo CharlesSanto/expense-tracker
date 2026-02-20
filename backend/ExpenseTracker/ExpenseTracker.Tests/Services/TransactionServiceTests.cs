@@ -245,7 +245,7 @@ namespace ExpenseTracker.Tests.Services
 
 #endregion
 
-            #region Delete Tests
+        #region Delete Tests
 
             [Fact]
         public async Task DeleteTransaction_ShouldReturnTrue_WhenRepositoryReturnsTrue()
