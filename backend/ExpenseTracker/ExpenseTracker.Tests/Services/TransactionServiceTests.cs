@@ -1,5 +1,4 @@
-﻿using Xunit;
-using Moq;
+﻿using Moq;
 using FluentAssertions;
 using ExpenseTracker.Services;
 using ExpenseTracker.Repositories.Interfaces;
@@ -84,7 +83,7 @@ namespace ExpenseTracker.Tests.Services
             var result = await _transactionService.GetTransactionByIdAsync(1, 1);
 
             result.Should().NotBeNull();
-            result!.Id.Should().Be(1);
+            result.Id.Should().Be(1);
         }
 
         [Fact]
@@ -96,6 +95,64 @@ namespace ExpenseTracker.Tests.Services
             var result = await _transactionService.GetTransactionByIdAsync(1, 99);
 
             result.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task GetAllTransactionsAsync_ShouldReturnListOfDtos_WhenTransactionsExist()
+        {
+            int userId = 1;
+            var transactions = new List<Transaction>
+            {
+                new Transaction
+                {
+                    Id = 1,
+                    UserId = userId,
+                    Description = "Aluguel",
+                    Amount = 1500,
+                    Category = Category.Housing,
+                    Type = TransactionType.Expense,
+                    PaymentType = PaymentType.BankTransfer,
+                    Date = DateTime.UtcNow
+                },
+                new Transaction
+                {
+                    Id = 2,
+                    UserId = userId,
+                    Description = "Salário",
+                    Amount = 5000,
+                    Category = Category.Salary,
+                    Type = TransactionType.Income,
+                    PaymentType = PaymentType.BankTransfer,
+                    Date = DateTime.UtcNow
+                }
+            };
+
+            _transactionRepositoryMock.Setup(r => r.GetAllTransactionsAsync(userId)).
+                ReturnsAsync(transactions);
+
+            var result = await _transactionService.GetAllTransactionsAsync(userId);
+
+            result.Should().NotBeNull();
+            result.Should().HaveCount(2);
+            result.Should().AllBeOfType<TransactionResponseDto>();
+
+            var firstResult = result.First();
+            firstResult.Description.Should().Be("Aluguel");
+            firstResult.Amount.Should().Be(1500);
+        }
+
+        [Fact]
+        public async Task GetAllTransactionsAsync_ShouldReturnEmptyList_WhenNoTransactionsExist()
+        {
+            int user = 1;
+
+            _transactionRepositoryMock.Setup(r => r.GetAllTransactionsAsync(user))
+                .ReturnsAsync(new List<Transaction>());
+
+            var result = await _transactionService.GetAllTransactionsAsync(user);
+
+            result.Should().NotBeNull();
+            result.Should().BeEmpty();
         }
 
         #endregion
@@ -167,7 +224,25 @@ namespace ExpenseTracker.Tests.Services
             _transactionRepositoryMock.Verify(r => r.UpdateTransactionAsync(It.IsAny<int>(), It.IsAny<Transaction>()), Times.Never);
         }
 
-        #endregion
+        [Fact]
+        public async Task UpdateTransaction_ShouldOnlyUpdateCategory_WhenOnlyCategoryIsProvided()
+        {
+            var existing = new Transaction { Id = 1, UserId = 1, Amount = 500, Category = Category.Food };
+            var updateDto = new UpdateTransactionDto { Category = Category.Housing };
+
+            _transactionRepositoryMock.Setup(r => r.GetTransactionByIdAsync(1, 1))
+                .ReturnsAsync(existing);
+
+            _transactionRepositoryMock.Setup(r => r.UpdateTransactionAsync(1, It.IsAny<Transaction>()))
+                .ReturnsAsync((int id, Transaction t) => t);
+
+            var result = await _transactionService.UpdateTransactionAsync(1, 1, updateDto);
+
+            result!.Category.Should().Be(Category.Housing);
+            result.Amount.Should().Be(500);
+        }
+
+#endregion
 
         #region Delete Tests
 
