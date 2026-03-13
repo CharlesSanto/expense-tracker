@@ -1,5 +1,4 @@
-﻿using Xunit;
-using Moq;
+﻿using Moq;
 using FluentAssertions;
 using ExpenseTracker.Services;
 using ExpenseTracker.Repositories.Interfaces;
@@ -247,7 +246,7 @@ namespace ExpenseTracker.Tests.Services
 
         #region Delete Tests
 
-            [Fact]
+        [Fact]
         public async Task DeleteTransaction_ShouldReturnTrue_WhenRepositoryReturnsTrue()
         {
             _transactionRepositoryMock.Setup(r => r.DeleteTransactionAsync(1, 1))
