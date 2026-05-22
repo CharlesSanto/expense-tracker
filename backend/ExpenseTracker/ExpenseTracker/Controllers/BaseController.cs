@@ -17,7 +17,7 @@ namespace ExpenseTracker.Controllers
 
             if (!int.TryParse(userIdClaim, out int id))
             {
-                throw new FormatException($"Esperado ID numérico, mas recebeu: '{userIdClaim}'.");
+                throw new UnauthorizedAccessException($"Esperado ID numérico, mas recebeu: '{userIdClaim}'.");
             }
 
             return id;
