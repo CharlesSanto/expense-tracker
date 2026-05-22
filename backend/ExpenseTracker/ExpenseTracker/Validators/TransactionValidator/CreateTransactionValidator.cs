@@ -9,7 +9,7 @@ namespace ExpenseTracker.Validators.TransactionValidator
         {
             RuleFor(t => t.Description)
                 .NotEmpty().WithMessage("Campo obrigatório.")
-                .MaximumLength(255).WithMessage("Descrição não pode exceder 255 caracteres.");
+                .MaximumLength(200).WithMessage("Descrição não pode exceder 200 caracteres.");
 
             RuleFor(t => t.Amount)
                 .GreaterThan(0).WithMessage("O valor deve ser maior que zero.");
