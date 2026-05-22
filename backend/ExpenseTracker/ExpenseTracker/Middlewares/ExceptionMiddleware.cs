@@ -6,13 +6,17 @@ namespace ExpenseTracker.Middlewares
     public class ExceptionMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger<ExceptionMiddleware> _logger;
+        private readonly IHostEnvironment _env;
 
-        public ExceptionMiddleware(RequestDelegate next)
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger, IHostEnvironment env)
         {
             _next = next;
+            _logger = logger;
+            _env = env;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
             try
             {
@@ -21,35 +25,47 @@ namespace ExpenseTracker.Middlewares
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Uma exceção não tratada ocorreu durante a requisição HTTP: {Message}", ex.Message);
                 await HandleExceptionAsync(context, ex);
             }
         }
 
-        private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             context.Response.ContentType = "application/json";
             
-            var statusCode = (int)HttpStatusCode.InternalServerError;
-            var message = "Ocorreu um erro interno no servidor.";
-
-            if (exception is ArgumentException)
+            var statusCode = exception switch
             {
-                statusCode = (int)HttpStatusCode.BadRequest;
-                message = exception.Message;
-            }
+                ArgumentException => HttpStatusCode.BadRequest,
+                UnauthorizedAccessException => HttpStatusCode.Unauthorized,
+                _ => HttpStatusCode.InternalServerError
+            };
 
-            context.Response.StatusCode = statusCode;
-
-            var response = new ErrorResponse
+            context.Response.StatusCode = (int)statusCode;
+            var response = new
             {
-                StatusCode = statusCode,
-                Message = message
+                StatusCode = context.Response.StatusCode,
+                Message = statusCode == HttpStatusCode.InternalServerError 
+                    ? "Ocorreu um erro interno no servidor. Por favor, tente novamente mais tarde."
+                    : exception.Message
             };
 
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-            var json = JsonSerializer.Serialize(response, options);
 
-            return context.Response.WriteAsync(json);
+            if (_env.IsDevelopment() && statusCode == HttpStatusCode.InternalServerError)
+            {
+                var devResponse = new
+                {
+                    response.StatusCode,
+                    response.Message,
+                    Details = exception.StackTrace
+                };
+
+                await context.Response.WriteAsync(JsonSerializer.Serialize(devResponse, options));
+                return;
+            }
+
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response, options));
         }
     }
 }

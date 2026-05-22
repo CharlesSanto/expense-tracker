@@ -18,16 +18,14 @@ namespace ExpenseTracker.Services
 
             return transaction == null ? null : new TransactionResponseDto(transaction);
         }
-        public async Task<IEnumerable<TransactionResponseDto>> GetAllTransactionsAsync(int userId)
+        public async Task<IEnumerable<TransactionResponseDto>> GetAllTransactionsAsync(int userId, int pageNumber, int pageSize)
         {
-            var transactions = await _transactionRepository.GetAllTransactionsAsync(userId);
+            var transactions = await _transactionRepository.GetAllTransactionsAsync(userId, pageNumber, pageSize);
 
             return transactions.Select(t => new TransactionResponseDto(t)).ToList();    
         }
         public async Task<TransactionResponseDto?> CreateTransactionAsync(int userId, CreateTransactionDto transaction)
-        { 
-            if (transaction.Amount <= 0) return null;
-
+        {
             var newTransaction = new Transaction
             {
                 UserId = userId,
@@ -53,8 +51,6 @@ namespace ExpenseTracker.Services
 
             if (transaction.Amount.HasValue)
             {
-                if (transaction.Amount <= 0)
-                    return null;
                 existingTransaction.Amount = transaction.Amount.Value;
             }
 

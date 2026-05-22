@@ -20,11 +20,12 @@ namespace ExpenseTracker.Services
 
             var transactions = await _transactionRepository.GetByDateRangeAsync(userId, finalStart, finalEnd);
 
-            var incomes = transactions.Where(t => t.Type == TransactionType.Income).ToList();
-            var expenses = transactions.Where(t => t.Type == TransactionType.Expense).ToList();
+            var totalIncome = await _transactionRepository.GetTotalAmountByTypeAsync(userId, TransactionType.Income, finalStart, finalEnd);
+            var totalExpense = await _transactionRepository.GetTotalAmountByTypeAsync(userId, TransactionType.Expense, finalStart, finalEnd);
 
-            var totalIncome = incomes.Sum(t => t.Amount);
-            var totalExpense = expenses.Sum(t => t.Amount);
+            var incomesCategoriesRaw = await _transactionRepository.GetCategorySummaryAsync(userId, TransactionType.Income, finalStart, finalEnd);
+            var expensesCategoriesRaw = await _transactionRepository.GetCategorySummaryAsync(userId, TransactionType.Expense, finalStart, finalEnd);
+            var paymentMethodsRaw = await _transactionRepository.GetPaymentTypeSummaryAsync(userId, finalStart, finalEnd);
 
             var report = new FinancialReportDto
             {
@@ -34,55 +35,38 @@ namespace ExpenseTracker.Services
                 TotalIncome = totalIncome,
                 TotalExpense = totalExpense,
 
-                IncomeCategories = incomes
-                    .GroupBy(t => t.Category)
-                    .Select(g =>
+                IncomeCategories = incomesCategoriesRaw
+                    .Select(t => new CategorySummaryDto
                     {
-                        var amount = g.Sum(t => t.Amount);
-
-                        return new CategorySummaryDto
-                        {
-                            CategoryName = g.Key.ToString(),
-                            Amount = amount,
-                            Percentage = totalIncome > 0
-                            ? (double)Math.Round((amount / totalIncome) * 100, 2)
+                        CategoryName = t.Key.ToString(),
+                        Amount = t.Value,
+                        Percentage = totalIncome > 0
+                            ? (double)Math.Round((t.Value / totalIncome) * 100, 2)
                             : 0
-                        };
                     })
                     .OrderByDescending(c => c.Amount)
                     .ToList(),
 
-                ExpenseCategories = expenses
-                    .GroupBy(t => t.Category)
-                    .Select(g =>
+                ExpenseCategories = expensesCategoriesRaw
+                    .Select(t => new CategorySummaryDto
                     {
-                        var amount = g.Sum(t => t.Amount);
-
-                        return new CategorySummaryDto
-                        {
-                            CategoryName = g.Key.ToString(),
-                            Amount = amount,
-                            Percentage = totalExpense > 0
-                            ? (double)Math.Round((amount / totalExpense) * 100, 2)
+                        CategoryName = t.Key.ToString(),
+                        Amount = t.Value,
+                        Percentage = totalExpense > 0
+                            ? (double)Math.Round((t.Value / totalExpense) * 100, 2)
                             : 0
-                        };
                     })
                     .OrderByDescending(c => c.Amount)
                     .ToList(),
 
-                PaymentMethods = expenses
-                    .GroupBy(t => t.PaymentType)
-                    .Select(g => 
+                PaymentMethods = paymentMethodsRaw
+                    .Select(t => new PaymentTypeSummaryDto
                     {
-                        var total = g.Sum(t => t.Amount);
-                        return new PaymentTypeSummaryDto
-                        {
-                            PaymentType = g.Key.ToString(),
-                            Amount = total,
+                        PaymentType = t.Key.ToString(),
+                            Amount = t.Value,
                             Percentage = totalExpense > 0
-                            ? (double)Math.Round((total / totalExpense) * 100, 2)
+                            ? (double)Math.Round((t.Value / totalExpense) * 100, 2)
                             : 0
-                        };
                     })
                     .OrderByDescending(p => p.Amount)
                     .ToList(),

@@ -19,27 +19,7 @@ namespace ExpenseTracker.Tests.Services
             _transactionService = new TransactionService(_transactionRepositoryMock.Object);
         }
 
-        #region Create Tests
-
-        [Fact]
-        public async Task CreateTransaction_ShouldReturnNull_WhenAmountIsNegative()
-        {
-            var dto = new CreateTransactionDto
-            {
-                Amount = -100,
-                Description = "Teste",
-                Category = Category.Food,
-                Type = TransactionType.Expense,
-                PaymentType = PaymentType.CreditCard,
-                Date = DateTime.UtcNow
-            };
-
-            var result = await _transactionService.CreateTransactionAsync(1, dto);
-
-            result.Should().BeNull();
-
-            _transactionRepositoryMock.Verify(r => r.CreateTransactionAsync(It.IsAny<Transaction>()), Times.Never);
-        }
+        #region Create Testss
 
         [Fact]
         public async Task CreateTransaction_ShouldCallRepository_WithCorrectMappedValues()
@@ -127,10 +107,10 @@ namespace ExpenseTracker.Tests.Services
                 }
             };
 
-            _transactionRepositoryMock.Setup(r => r.GetAllTransactionsAsync(userId)).
+            _transactionRepositoryMock.Setup(r => r.GetAllTransactionsAsync(userId, 1, 10)).
                 ReturnsAsync(transactions);
 
-            var result = await _transactionService.GetAllTransactionsAsync(userId);
+            var result = await _transactionService.GetAllTransactionsAsync(userId, 1, 10);
 
             result.Should().NotBeNull();
             result.Should().HaveCount(2);
@@ -146,10 +126,10 @@ namespace ExpenseTracker.Tests.Services
         {
             int user = 1;
 
-            _transactionRepositoryMock.Setup(r => r.GetAllTransactionsAsync(user))
+            _transactionRepositoryMock.Setup(r => r.GetAllTransactionsAsync(user, 1, 10))
                 .ReturnsAsync(new List<Transaction>());
 
-            var result = await _transactionService.GetAllTransactionsAsync(user);
+            var result = await _transactionService.GetAllTransactionsAsync(user, 1, 10);
 
             result.Should().NotBeNull();
             result.Should().BeEmpty();
@@ -205,22 +185,6 @@ namespace ExpenseTracker.Tests.Services
             var result = await _transactionService.UpdateTransactionAsync(1, 99, new UpdateTransactionDto());
 
             result.Should().BeNull();
-            _transactionRepositoryMock.Verify(r => r.UpdateTransactionAsync(It.IsAny<int>(), It.IsAny<Transaction>()), Times.Never);
-        }
-
-        [Fact]
-        public async Task UpdateTransaction_ShouldReturnNull_WhenNewAmountIsInvalid()
-        {
-            var existingTransaction = new Transaction { Id = 1, UserId = 1, Amount = 50 };
-            var updateDto = new UpdateTransactionDto { Amount = -10 };
-
-            _transactionRepositoryMock.Setup(r => r.GetTransactionByIdAsync(1, 1))
-                .ReturnsAsync(existingTransaction);
-
-            var result = await _transactionService.UpdateTransactionAsync(1, 1, updateDto);
-
-            result.Should().BeNull();
-
             _transactionRepositoryMock.Verify(r => r.UpdateTransactionAsync(It.IsAny<int>(), It.IsAny<Transaction>()), Times.Never);
         }
 

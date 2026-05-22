@@ -18,11 +18,14 @@ namespace ExpenseTracker.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllTransactions()
+        public async Task<IActionResult> GetAllTransactions([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
+            if (pageNumber < 1 ) pageNumber = 1;
+            if (pageSize < 1 || pageSize > 50) pageSize = 10;
+
             int userId = GetUserId();
 
-            var transactions = await _transactionService.GetAllTransactionsAsync(userId);
+            var transactions = await _transactionService.GetAllTransactionsAsync(userId, pageNumber, pageSize);
             return Ok(transactions);
         }
 

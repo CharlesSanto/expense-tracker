@@ -9,7 +9,7 @@ namespace ExpenseTracker.Validators.TransactionValidator
         {
             RuleFor(t => t.Description)
                 .NotEmpty().WithMessage("A descrição não pode ser vazia ao atualizar.")
-                .MaximumLength(255).WithMessage("Descrição não pode exceder 255 caracteres.")
+                .MaximumLength(200).WithMessage("Descrição não pode exceder 200 caracteres.")
                 .When(t => t.Description != null);
 
             RuleFor(t => t.Amount)
