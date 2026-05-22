@@ -8,7 +8,7 @@ namespace ExpenseTracker.Validators.UserValidator
         public UpdateUserValidator()
         {
             RuleFor(x => x.Name)
-                .MaximumLength(100).WithMessage("O nome deve ter no máximo 25 caracteres.")
+                .MaximumLength(100).WithMessage("O nome deve ter no máximo 100 caracteres.")
                 .When(x => !string.IsNullOrWhiteSpace(x.Name));
 
             RuleFor(x => x.Email)
