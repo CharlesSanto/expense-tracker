@@ -1,7 +1,8 @@
 ﻿using ExpenseTracker.Data.Models;
-using ExpenseTracker.Services.Interfaces;
-using ExpenseTracker.Repositories.Interfaces;
+using ExpenseTracker.DTOs;
 using ExpenseTracker.DTOs.TransactionDtos;
+using ExpenseTracker.Repositories.Interfaces;
+using ExpenseTracker.Services.Interfaces;   
 
 namespace ExpenseTracker.Services
 {
@@ -18,11 +19,12 @@ namespace ExpenseTracker.Services
 
             return transaction == null ? null : new TransactionResponseDto(transaction);
         }
-        public async Task<IEnumerable<TransactionResponseDto>> GetAllTransactionsAsync(int userId, int pageNumber, int pageSize)
+        public async Task<PagedResponseDto<TransactionResponseDto>> GetAllTransactionsAsync(int userId, int pageNumber, int pageSize)
         {
-            var transactions = await _transactionRepository.GetAllTransactionsAsync(userId, pageNumber, pageSize);
+            var(items, totalCount) = await _transactionRepository.GetAllTransactionsAsync(userId, pageNumber, pageSize);
+            var dtos = items.Select(t => new TransactionResponseDto(t)).ToList();
 
-            return transactions.Select(t => new TransactionResponseDto(t)).ToList();    
+            return new PagedResponseDto<TransactionResponseDto>(dtos, pageNumber, pageSize, totalCount);
         }
         public async Task<TransactionResponseDto?> CreateTransactionAsync(int userId, CreateTransactionDto transaction)
         {

@@ -78,18 +78,19 @@ namespace ExpenseTracker.Services
         private (DateTime start, DateTime end) CalculateDates(string range, DateTime? StartDate, DateTime? EndDate)
         {
             var now = DateTime.UtcNow;
+            var todayUtc = now.Date;
 
             return range.ToLower() switch
             {
-                "daily" => (now.Date, now.Date.AddDays(1).AddTicks(-1)),
+                "daily" => (todayUtc, todayUtc.AddDays(1).AddTicks(-1)),
 
-                "weekly" => (now.AddDays(-7).Date, now.Date.AddDays(1).AddTicks(-1)),
+                "weekly" => (todayUtc.AddDays(-7), todayUtc.AddDays(1).AddTicks(-1)),
 
-                "monthly" => (new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc),
-                              new DateTime(now.Year, now.Month, DateTime.DaysInMonth(now.Year, now.Month), 23, 59, 59, 999, DateTimeKind.Utc)),
+                "monthly" => (new DateTime(todayUtc.Year, todayUtc.Month, 1, 0, 0, 0, DateTimeKind.Utc),
+                              new DateTime(todayUtc.Year, todayUtc.Month, DateTime.DaysInMonth(todayUtc.Year, todayUtc.Month), 23, 59, 59, 999, DateTimeKind.Utc)),
 
-                "yearly" => (new DateTime(now.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                             new DateTime(now.Year, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc)),
+                "yearly" => (new DateTime(todayUtc.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                             new DateTime(todayUtc.Year, 12, 31, 23, 59, 59, 999, DateTimeKind.Utc)),
 
                 "custom" when StartDate.HasValue && EndDate.HasValue =>
                     (DateTime.SpecifyKind(StartDate.Value.Date, DateTimeKind.Utc),

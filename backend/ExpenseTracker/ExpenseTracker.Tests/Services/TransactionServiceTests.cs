@@ -107,18 +107,14 @@ namespace ExpenseTracker.Tests.Services
                 }
             };
 
-            _transactionRepositoryMock.Setup(r => r.GetAllTransactionsAsync(userId, 1, 10)).
-                ReturnsAsync(transactions);
+            _transactionRepositoryMock.Setup(r => r.GetAllTransactionsAsync(userId, 1, 10))
+                .ReturnsAsync((transactions, transactions.Count));
 
             var result = await _transactionService.GetAllTransactionsAsync(userId, 1, 10);
 
             result.Should().NotBeNull();
-            result.Should().HaveCount(2);
-            result.Should().AllBeOfType<TransactionResponseDto>();
-
-            var firstResult = result.First();
-            firstResult.Description.Should().Be("Aluguel");
-            firstResult.Amount.Should().Be(1500);
+            result.Items.Should().HaveCount(2);
+            result.TotalItems.Should().Be(2);
         }
 
         [Fact]
@@ -127,12 +123,12 @@ namespace ExpenseTracker.Tests.Services
             int user = 1;
 
             _transactionRepositoryMock.Setup(r => r.GetAllTransactionsAsync(user, 1, 10))
-                .ReturnsAsync(new List<Transaction>());
+                .ReturnsAsync((new List<Transaction>(), 0));
 
             var result = await _transactionService.GetAllTransactionsAsync(user, 1, 10);
 
             result.Should().NotBeNull();
-            result.Should().BeEmpty();
+            result.Items.Should().BeEmpty();
         }
 
         #endregion

@@ -24,9 +24,9 @@ namespace ExpenseTracker.Controllers
             if (pageSize < 1 || pageSize > 50) pageSize = 10;
 
             int userId = GetUserId();
+            var pagedResult = await _transactionService.GetAllTransactionsAsync(userId, pageNumber, pageSize);
 
-            var transactions = await _transactionService.GetAllTransactionsAsync(userId, pageNumber, pageSize);
-            return Ok(transactions);
+            return Ok(pagedResult);
         }
 
         [HttpGet("{transactionId:int}")]
@@ -51,7 +51,7 @@ namespace ExpenseTracker.Controllers
             return CreatedAtAction(nameof(GetTransactionById), new { transactionId = createdTransaction.Id }, createdTransaction);
         }
 
-        [HttpPatch("{transactionId:int}")]
+        [HttpPut("{transactionId:int}")]
         public async Task<IActionResult> UpdateTransaction(UpdateTransactionDto request, int transactionId)
         {
             int userId = GetUserId();
