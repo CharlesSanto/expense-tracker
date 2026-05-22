@@ -24,9 +24,9 @@ namespace ExpenseTracker.Controllers
             if (pageSize < 1 || pageSize > 50) pageSize = 10;
 
             int userId = GetUserId();
+            var pageResult = await _transactionService.GetAllTransactionsAsync(userId, pageNumber, pageSize);
 
-            var transactions = await _transactionService.GetAllTransactionsAsync(userId, pageNumber, pageSize);
-            return Ok(transactions);
+            return Ok(pageResult);
         }
 
         [HttpGet("{transactionId:int}")]
