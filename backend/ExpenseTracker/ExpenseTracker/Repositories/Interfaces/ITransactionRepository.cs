@@ -10,5 +10,8 @@ namespace ExpenseTracker.Repositories.Interfaces
         Task<Transaction?> UpdateTransactionAsync(int userId, Transaction transaction);
         Task<bool> DeleteTransactionAsync(int userId, int transactionId);
         Task<IEnumerable<Transaction>> GetByDateRangeAsync(int userId, DateTime StartDate, DateTime EndDate);
+        Task<decimal> GetTotalAmountByTypeAsync(int userId, ExpenseTracker.Data.Enums.TransactionType type, DateTime start, DateTime end);
+        Task<Dictionary<ExpenseTracker.Data.Enums.Category, decimal>> GetCategorySummaryAsync(int userId, ExpenseTracker.Data.Enums.TransactionType type, DateTime start, DateTime end);
+        Task<Dictionary<ExpenseTracker.Data.Enums.PaymentType, decimal>> GetPaymentTypeSummaryAsync(int userId, DateTime start, DateTime end);
     }
 }

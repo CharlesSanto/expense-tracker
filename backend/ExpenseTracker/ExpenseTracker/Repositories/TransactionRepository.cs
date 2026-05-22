@@ -62,6 +62,32 @@ namespace ExpenseTracker.Repositories
 
             return transactions;
         }
-        
+
+        public async Task<decimal> GetTotalAmountByTypeAsync(int userId, ExpenseTracker.Data.Enums.TransactionType type, DateTime start, DateTime end)
+        {
+            return await _context.Transactions
+                .AsNoTracking()
+                .Where(t => t.UserId == userId && t.Type == type && t.Date >= start && t.Date <= end)
+                .SumAsync(t => t.Amount);
+        }
+
+        public async Task<Dictionary<ExpenseTracker.Data.Enums.Category, decimal>> GetCategorySummaryAsync(int userId, ExpenseTracker.Data.Enums.TransactionType type, DateTime start, DateTime end)
+        {
+            return await _context.Transactions
+                .AsNoTracking()
+                .Where(t => t.UserId == userId && t.Type == type && t.Date >= start && t.Date <= end)
+                .GroupBy(t => t.Category)
+                .ToDictionaryAsync(g => g.Key, g => g.Sum(t => t.Amount));
+        }
+
+        public async Task<Dictionary<ExpenseTracker.Data.Enums.PaymentType, decimal>> GetPaymentTypeSummaryAsync(int userId, DateTime start, DateTime end)
+        {
+            return await _context.Transactions
+                .AsNoTracking()
+                .Where(t => t.UserId == userId && t.Type == ExpenseTracker.Data.Enums.TransactionType.Expense && t.Date >= start && t.Date <= end)
+                .GroupBy(t => t.PaymentType)
+                .ToDictionaryAsync(g => g.Key, g => g.Sum(t => t.Amount));
+        }
+
     }
 }
