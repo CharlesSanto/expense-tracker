@@ -51,7 +51,7 @@ namespace ExpenseTracker.Controllers
             return CreatedAtAction(nameof(GetTransactionById), new { transactionId = createdTransaction.Id }, createdTransaction);
         }
 
-        [HttpPatch("{transactionId:int}")]
+        [HttpPut("{transactionId:int}")]
         public async Task<IActionResult> UpdateTransaction(UpdateTransactionDto request, int transactionId)
         {
             int userId = GetUserId();
