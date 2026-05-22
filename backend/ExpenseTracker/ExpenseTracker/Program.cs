@@ -36,10 +36,18 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendCorsPolicy", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 builder.Services.Configure<ExpenseTracker.Configurations.JwtOptions>(builder.Configuration.GetSection("Jwt"));
 
-
-// Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(c =>
@@ -92,6 +100,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
     
 var app = builder.Build();
+
+app.UseCors("FrontendCorsPolicy");
 
 app.UseMiddleware<ExceptionMiddleware>();
 
