@@ -21,11 +21,14 @@ namespace ExpenseTracker.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.UserId == userId && t.Id == transactionId);
         }
-        public async Task<IEnumerable<Transaction>> GetAllTransactionsAsync(int userId)
+        public async Task<IEnumerable<Transaction>> GetAllTransactionsAsync(int userId, int pageNumber, int pageSize)
         {
             return await _context.Transactions
                 .AsNoTracking()
                 .Where(t => t.UserId == userId)
+                .OrderByDescending(t => t.Date)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
         public async Task<Transaction?> CreateTransactionAsync(Transaction transaction)

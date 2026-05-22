@@ -107,10 +107,10 @@ namespace ExpenseTracker.Tests.Services
                 }
             };
 
-            _transactionRepositoryMock.Setup(r => r.GetAllTransactionsAsync(userId)).
+            _transactionRepositoryMock.Setup(r => r.GetAllTransactionsAsync(userId, 1, 10)).
                 ReturnsAsync(transactions);
 
-            var result = await _transactionService.GetAllTransactionsAsync(userId);
+            var result = await _transactionService.GetAllTransactionsAsync(userId, 1, 10);
 
             result.Should().NotBeNull();
             result.Should().HaveCount(2);
@@ -126,10 +126,10 @@ namespace ExpenseTracker.Tests.Services
         {
             int user = 1;
 
-            _transactionRepositoryMock.Setup(r => r.GetAllTransactionsAsync(user))
+            _transactionRepositoryMock.Setup(r => r.GetAllTransactionsAsync(user, 1, 10))
                 .ReturnsAsync(new List<Transaction>());
 
-            var result = await _transactionService.GetAllTransactionsAsync(user);
+            var result = await _transactionService.GetAllTransactionsAsync(user, 1, 10);
 
             result.Should().NotBeNull();
             result.Should().BeEmpty();
