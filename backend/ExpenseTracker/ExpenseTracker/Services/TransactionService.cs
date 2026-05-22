@@ -25,9 +25,7 @@ namespace ExpenseTracker.Services
             return transactions.Select(t => new TransactionResponseDto(t)).ToList();    
         }
         public async Task<TransactionResponseDto?> CreateTransactionAsync(int userId, CreateTransactionDto transaction)
-        { 
-            if (transaction.Amount <= 0) return null;
-
+        {
             var newTransaction = new Transaction
             {
                 UserId = userId,
@@ -53,8 +51,6 @@ namespace ExpenseTracker.Services
 
             if (transaction.Amount.HasValue)
             {
-                if (transaction.Amount <= 0)
-                    return null;
                 existingTransaction.Amount = transaction.Amount.Value;
             }
 
