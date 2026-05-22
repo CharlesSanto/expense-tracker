@@ -6,7 +6,7 @@ namespace ExpenseTracker.Services.Interfaces
 {
     public interface IAuthService
     {
-        Task<AuthResponseDto> LoginAsync(LoginDto loginDto);
+        Task<AuthResponseDto?> LoginAsync(LoginDto loginDto);
         string GenerateJwtToken(UserResponseDto user);
 
     }

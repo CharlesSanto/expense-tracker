@@ -44,7 +44,7 @@ public class UserServiceTests
     {
         _userRepositoryMock
             .Setup(r => r.GetUserByIdAsync(It.IsAny<int>()))
-            .ReturnsAsync((User)null);
+            .ReturnsAsync((User?)null);
 
         var result = await _userService.GetUserByIdAsync(1);
 
@@ -63,7 +63,7 @@ public class UserServiceTests
 
         _userRepositoryMock
             .Setup(r => r.GetUserByEmailAsync(registerDto.Email.ToLower()))
-            .ReturnsAsync((User)null);
+            .ReturnsAsync((User?)null);
 
         _userRepositoryMock
             .Setup(r => r.CreateUserAsync(It.IsAny<User>()))
