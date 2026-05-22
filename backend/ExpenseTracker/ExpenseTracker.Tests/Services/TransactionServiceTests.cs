@@ -161,7 +161,7 @@ namespace ExpenseTracker.Tests.Services
                 .ReturnsAsync(existingTransaction);
 
             _transactionRepositoryMock.Setup(r => r.UpdateTransactionAsync(1, It.IsAny<Transaction>()))
-                .ReturnsAsync((int id, Transaction t) => t);
+                .ReturnsAsync((int userId, Transaction t) => t);
 
             var result = await _transactionService.UpdateTransactionAsync(1, 1, updateDto);
                 
@@ -198,7 +198,7 @@ namespace ExpenseTracker.Tests.Services
                 .ReturnsAsync(existing);
 
             _transactionRepositoryMock.Setup(r => r.UpdateTransactionAsync(1, It.IsAny<Transaction>()))
-                .ReturnsAsync((int id, Transaction t) => t);
+                .ReturnsAsync((int userId, Transaction t) => t);
 
             var result = await _transactionService.UpdateTransactionAsync(1, 1, updateDto);
 
@@ -206,7 +206,7 @@ namespace ExpenseTracker.Tests.Services
             result.Amount.Should().Be(500);
         }
 
-#endregion
+        #endregion
 
         #region Delete Tests
 

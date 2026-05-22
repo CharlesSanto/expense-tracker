@@ -8,7 +8,8 @@ namespace ExpenseTracker.Validators.AuthValidator
         public RegisterValidator() 
         { 
             RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Campo obrigatório");
+                .NotEmpty().WithMessage("Campo obrigatório")
+                .MaximumLength(100).WithMessage("O nome deve ter no máximo 100 caracteres.");
 
             RuleFor(x => x.Email)
                 .NotEmpty().WithMessage("Campo obrigatório")

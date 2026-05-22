@@ -70,10 +70,16 @@ namespace ExpenseTracker.Services
 
                 user.Email = updateUser.Email.ToLower();
             }
-                
 
             if (!string.IsNullOrWhiteSpace(updateUser.Password))
+            {
+                if (string.IsNullOrWhiteSpace(updateUser.CurrentPassword) || !PasswordHasher.VerifyPassword(updateUser.CurrentPassword, user.PasswordHash))
+                {
+                    throw new InvalidOperationException("Senha incorreta.");
+                }
+
                 user.PasswordHash = PasswordHasher.HashPassword(updateUser.Password);
+            }
 
             user.UpdatedAt = DateTime.UtcNow;
 
