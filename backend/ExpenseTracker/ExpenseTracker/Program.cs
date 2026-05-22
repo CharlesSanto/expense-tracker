@@ -36,6 +36,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.Configure<ExpenseTracker.Configurations.JwtOptions>(builder.Configuration.GetSection("Jwt"));
 
 
 // Add services to the container.

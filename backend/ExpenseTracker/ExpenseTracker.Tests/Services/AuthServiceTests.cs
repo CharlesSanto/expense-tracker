@@ -5,26 +5,27 @@ using ExpenseTracker.Repositories.Interfaces;
 using ExpenseTracker.Security;
 using ExpenseTracker.Services;
 using FluentAssertions;
-using Microsoft.Extensions.Configuration;
 using Moq;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 public class AuthServiceTests
 {
     private readonly Mock<IUserRepository> _userRepositoryMock;
-    private readonly Mock<IConfiguration> _configurationMock;
     private readonly AuthService _authService;
 
     public AuthServiceTests()
     {
         _userRepositoryMock = new Mock<IUserRepository>();
-        _configurationMock = new Mock<IConfiguration>();
 
-        _configurationMock.Setup(x => x["Jwt:Key"]).Returns("super_secret_key_12345678901234567890");
-        _configurationMock.Setup(x => x["Jwt:Issuer"]).Returns("test_issuer");
-        _configurationMock.Setup(x => x["Jwt:Audience"]).Returns("test_audience");
+        var options = Options.Create(new ExpenseTracker.Configurations.JwtOptions
+        {
+            Key = "super_secret_key_12345678901234567890",
+            Issuer = "test_issuer",
+            Audience = "test_audience"
+        });
 
-        _authService = new AuthService(_userRepositoryMock.Object, _configurationMock.Object);
+        _authService = new AuthService(_userRepositoryMock.Object, options);
     }
 
     [Fact]
