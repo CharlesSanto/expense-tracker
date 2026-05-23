@@ -62,6 +62,8 @@ namespace ExpenseTracker.Services
             if (transaction.Category.HasValue)
                 existingTransaction.Category = transaction.Category.Value;
 
+            if (transaction.Type.HasValue) existingTransaction.Type = transaction.Type.Value; 
+
             if (transaction.PaymentType.HasValue)
                 existingTransaction.PaymentType = transaction.PaymentType.Value;
 

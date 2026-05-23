@@ -15,7 +15,11 @@ namespace ExpenseTracker.Validators.TransactionValidator
             RuleFor(t => t.Amount)
                 .GreaterThan(0).WithMessage("O valor deve ser maior que zero.")
                 .When(t => t.Amount.HasValue);
-                
+
+            RuleFor(t => t.Type)
+                .IsInEnum().WithMessage("O tipo de transação informado é inválido.")
+                .When(t => t.Type.HasValue);
+
             RuleFor(t => t.Category)
                 .IsInEnum().WithMessage("A categoria informada é inválida.")
                 .When(t => t.Category.HasValue);
